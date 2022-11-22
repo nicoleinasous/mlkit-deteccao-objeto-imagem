@@ -32,6 +32,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
+import com.google.mlkit.common.model.DownloadConditions
+import com.google.mlkit.common.model.RemoteModelManager
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -43,6 +45,11 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.objects.DetectedObject
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
+
+import com.google.mlkit.nl.translate.TranslateLanguage
+import com.google.mlkit.nl.translate.TranslateRemoteModel
+import com.google.mlkit.nl.translate.Translation
+import com.google.mlkit.nl.translate.TranslatorOptions
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     companion object {
@@ -129,12 +136,61 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
                 // Parse ML Kit's DetectedObject and create corresponding visualization data
                 val detectedObjects = it.map { obj ->
-                    var text = "Unknown"
+                    var text   = "Unknown"
+
 
                     // We will show the top confident detection result if it exist
                     if (obj.labels.isNotEmpty()) {
                         val firstLabel = obj.labels.first()
+                        //var ptText = ""
+
+                        // Download the Portuguese model
+                        /*val modelManager = RemoteModelManager.getInstance()
+                        val portugueseModel = TranslateRemoteModel.Builder(TranslateLanguage.PORTUGUESE).build()
+                        val conditionsModel = DownloadConditions.Builder()
+                            //.requireWifi()
+                            .build()
+                        modelManager.download(portugueseModel, conditionsModel)
+                            .addOnSuccessListener {
+                                Log.d(TAG, "Translator Model downloaded")
+                            }
+                            .addOnFailureListener {
+                                Log.d(TAG, "Translator Model couldn’t be downloaded or other internal error")
+                            }
+                         */
+
+                        // Create an English-Portuguese translator:
+                        /*val options = TranslatorOptions.Builder()
+                            .setSourceLanguage(TranslateLanguage.ENGLISH)
+                            .setTargetLanguage(TranslateLanguage.PORTUGUESE)
+                            .build()
+                        val englishPortugueseTranslator = Translation.getClient(options)
+
+                        var conditions = DownloadConditions.Builder()
+                            .requireWifi()
+                            .build()
+
+                        englishPortugueseTranslator.downloadModelIfNeeded(conditions)
+                            .addOnSuccessListener {
+                                englishPortugueseTranslator.translate(firstLabel.text)
+                                    .addOnSuccessListener { translatedText ->
+                                        Log.v(TAG, "Texto traduzido: " + translatedText)
+                                        ptText = translatedText
+                                        Log.v(TAG, "variável: " + ptText)
+                                    }
+                                    .addOnFailureListener { exception ->
+                                        Log.v(TAG, "Erro ao traduzir texto")
+                                        ptText = firstLabel.text
+                                    }
+                            }
+                            .addOnFailureListener { exception ->
+                                Log.d(TAG, "Translator Model couldn’t be downloaded or other internal error")
+                            }
+                         */
+
+                        //Log.d(TAG, "variável Label: " + firstLabel.text)
                         text = "${firstLabel.text}, ${firstLabel.confidence.times(100).toInt()}%"
+                        //text = "${ptText}, ${firstLabel.confidence.times(100).toInt()}%"
                     }
                     BoxWithText(obj.boundingBox, text)
                 }
